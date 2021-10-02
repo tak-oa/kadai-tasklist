@@ -14,16 +14,16 @@ import models.Task;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class ShowServlet
+ * Servlet implementation class EditServlet
  */
-@WebServlet("/show")
-public class ShowServlet extends HttpServlet {
+@WebServlet("/edit")
+public class EditServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ShowServlet() {
+    public EditServlet() {
         super();
 
     }
@@ -34,15 +34,19 @@ public class ShowServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
-        // 該当IDのメッセージ1件のみをデータベースから取得
-        Task t = em.find(Task.class, Integer.parseInt(request.getParameter("id")));
+        // 該当IDのタスク1件のみをデータベースから取得
+        Task t =em.find(Task.class, Integer.parseInt(request.getParameter("id")));
 
         em.close();
 
-        // タスクデータをリクエストスコープにセットしてshow.jspを呼び出す
+        // メッセージ情報とセッションIDをリクエストスコープに登録
         request.setAttribute("task", t);
+        request.setAttribute("_token", request.getSession().getId());
 
-        RequestDispatcher rd =request.getRequestDispatcher("/WEB-INF/views/tasks/show.jsp");
+        // メッセージIDをセッションスコープに登録
+        request.getSession().setAttribute("task_id", t.getId());
+
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/edit.jsp");
         rd.forward(request, response);
     }
 
